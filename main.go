@@ -1,6 +1,10 @@
 package main
 
 import (
+	"net/http"
+	"os"
+	"time"
+
 	"github.com/gin-gonic/gin"
 )
 
@@ -9,6 +13,14 @@ func main() {
 
 	router(r)
 
-	// r.Run(os.Getenv("PORT"))
-	r.Run("localhost:7000")
+	server := &http.Server{
+		Addr:         os.Getenv("PORT"),
+		Handler:      r,
+		ReadTimeout:  60 * time.Second,
+		WriteTimeout: 60 * time.Second,
+		// MaxHeaderBytes: ,
+	}
+
+	// if err?
+	server.ListenAndServe()
 }
