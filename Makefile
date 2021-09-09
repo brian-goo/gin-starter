@@ -1,5 +1,5 @@
 LOCAL_PORT = localhost:7000
-DEPLOY_DEV_PORT = :7000
+DEPLOY_PORT = :7000
 
 run:
 	PORT=$(LOCAL_PORT) go run .

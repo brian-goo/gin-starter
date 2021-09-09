@@ -1,6 +1,7 @@
 package main
 
 import (
+	mdw "gtest/middleware"
 	"net/http"
 	"os"
 	"time"
@@ -10,6 +11,8 @@ import (
 
 func main() {
 	r := gin.Default()
+	r.Use(mdw.CORS())
+	// r.Use(cors.Default())
 
 	router(r)
 
