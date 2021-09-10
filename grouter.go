@@ -8,5 +8,6 @@ import (
 
 func router(r *gin.Engine) {
 	r.GET("/ping", handler.GetPing)
+	r.HEAD("/ping", handler.GetPing)
 
 }
