@@ -17,8 +17,14 @@ func main() {
 	router(r)
 
 	server := &http.Server{
-		Addr:         os.Getenv("PORT"),
-		Handler:      r,
+		Addr: os.Getenv("PORT"),
+		Handler: http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+			if req.Method == "HEAD" {
+				req.Method = "GET"
+			}
+			r.ServeHTTP(w, req)
+		}),
+		// Handler:      r,
 		ReadTimeout:  60 * time.Second,
 		WriteTimeout: 60 * time.Second,
 		// MaxHeaderBytes: ,

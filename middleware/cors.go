@@ -18,11 +18,6 @@ func CORS() gin.HandlerFunc {
 			return
 		}
 
-		// if c.Request.Method == "HEAD" {
-		// 	c.Request.Method = "GET"
-		// 	c.Writer.Write([]byte(nil))
-		// }
-
 		c.Next()
 	}
 }
