@@ -12,7 +12,7 @@ import (
 func main() {
 	r := gin.Default()
 	r.Use(mdw.CORS())
-	// r.Use(cors.Default())
+	r.Use(mdw.AuthAPIKey())
 
 	router(r)
 

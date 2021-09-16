@@ -6,9 +6,10 @@ CURL_GET_LOCAL := curl --header "Authorization: Bearer $(TOKEN)" $(LOCAL_PORT)
 CURL_POST_LOCAL := curl --header "Content-Type: application/json" --header "Authorization: Bearer $(TOKEN)" --request POST $(LOCAL_PORT)
 
 run:
-	PORT=$(LOCAL_PORT) go run .
+	PORT=$(LOCAL_PORT) API_KEY=$(TOKEN) go run .
 
 dev: export PORT=$(LOCAL_PORT)
+dev: export API_KEY=$(TOKEN)
 dev:
 	nodemon --exec go run . --signal SIGKILL
 
