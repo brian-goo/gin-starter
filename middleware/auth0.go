@@ -5,10 +5,12 @@ import (
 	"errors"
 	"net/http"
 	"os"
+	"time"
 
 	jwtmiddleware "github.com/auth0/go-jwt-middleware"
 	jwt "github.com/form3tech-oss/jwt-go"
 	"github.com/gin-gonic/gin"
+	cache "github.com/patrickmn/go-cache"
 )
 
 type Jwks struct {
@@ -24,30 +26,37 @@ type JSONWebKeys struct {
 	X5c []string `json:"x5c"`
 }
 
+var Cache = cache.New(12*time.Hour, 12*time.Hour)
+
 func getPemCert(token *jwt.Token) (string, error) {
 	cert := ""
-	resp, err := http.Get(os.Getenv("ISS") + ".well-known/jwks.json")
-
-	if err != nil {
-		return cert, err
-	}
-	defer resp.Body.Close()
-
 	var jwks = Jwks{}
-	err = json.NewDecoder(resp.Body).Decode(&jwks)
 
-	if err != nil {
-		return cert, err
+	if cached, found := Cache.Get("JWKS"); found {
+		jwks = cached.(Jwks)
+	} else {
+		resp, err := http.Get(os.Getenv("ISS") + ".well-known/jwks.json")
+		if err != nil {
+			return cert, err
+		}
+		defer resp.Body.Close()
+
+		err = json.NewDecoder(resp.Body).Decode(&jwks)
+		if err != nil {
+			return cert, err
+		}
+
+		Cache.Set("JWKS", jwks, cache.DefaultExpiration)
 	}
 
-	for k, _ := range jwks.Keys {
+	for k := range jwks.Keys {
 		if token.Header["kid"] == jwks.Keys[k].Kid {
 			cert = "-----BEGIN CERTIFICATE-----\n" + jwks.Keys[k].X5c[0] + "\n-----END CERTIFICATE-----"
 		}
 	}
 
 	if cert == "" {
-		err := errors.New("unable to find appropriate key")
+		err := errors.New("unable to find appropriate public key")
 		return cert, err
 	}
 
@@ -81,7 +90,7 @@ var jwtMiddleware = jwtmiddleware.New(jwtmiddleware.Options{
 		}
 
 		iss := os.Getenv("ISS")
-		checkIss := token.Claims.(jwt.MapClaims).VerifyIssuer(iss, false)
+		checkIss := token.Claims.(jwt.MapClaims).VerifyIssuer(iss, true)
 		if !checkIss {
 			return token, errors.New("invalid issuer")
 		}
@@ -103,7 +112,8 @@ func Auth0() gin.HandlerFunc {
 		err := jwtMiddleware.CheckJWT(c.Writer, c.Request)
 		if err != nil {
 			// Token not found
-			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"status": "unauthorized"})
+			c.AbortWithStatus(http.StatusUnauthorized)
+			// c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"status": "unauthorized"})
 			return
 		}
 
