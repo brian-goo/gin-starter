@@ -111,9 +111,8 @@ func Auth0() gin.HandlerFunc {
 		// Get the client secret key
 		err := jwtMiddleware.CheckJWT(c.Writer, c.Request)
 		if err != nil {
-			// Token not found
+			// Token not found, looks like respond w text/plain from lib
 			c.AbortWithStatus(http.StatusUnauthorized)
-			// c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"status": "unauthorized"})
 			return
 		}
 
