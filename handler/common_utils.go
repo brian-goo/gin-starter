@@ -7,6 +7,10 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+func logErr(c *gin.Context, err string) {
+	c.Error(errors.New(err))
+}
+
 func getSubFromAuth0Token(c *gin.Context) (string, error) {
 	token, ok := c.Request.Context().Value("user").(*jwt.Token)
 	if !ok {
