@@ -2,6 +2,7 @@ package main
 
 import (
 	mdw "gtest/middleware"
+	"log"
 	"net/http"
 	"os"
 	"time"
@@ -31,6 +32,5 @@ func main() {
 		// MaxHeaderBytes: ,
 	}
 
-	// if err?
-	server.ListenAndServe()
+	log.Fatal("failed to start server:", server.ListenAndServe())
 }
