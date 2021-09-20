@@ -7,8 +7,16 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func logErr(c *gin.Context, err string) {
-	c.Error(errors.New(err))
+func logErr(c *gin.Context, err interface{}) {
+	switch e := err.(type) {
+	// this is for standard error type eg. from db lib
+	case error:
+		c.Error(e)
+	case string:
+		c.Error(errors.New(e))
+	default:
+		c.Error(errors.New("error occurred: details unknown"))
+	}
 }
 
 func getSubFromAuth0Token(c *gin.Context) (string, error) {
