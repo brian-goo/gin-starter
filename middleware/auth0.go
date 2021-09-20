@@ -3,6 +3,7 @@ package middleware
 import (
 	"encoding/json"
 	"errors"
+	"gtest/handler"
 	"net/http"
 	"os"
 	"time"
@@ -112,6 +113,7 @@ func Auth0() gin.HandlerFunc {
 		err := jwtMiddleware.CheckJWT(c.Writer, c.Request)
 		if err != nil {
 			// Token not found, looks like respond w text/plain from lib
+			handler.LogErr(c, err)
 			c.AbortWithStatus(http.StatusUnauthorized)
 			return
 		}

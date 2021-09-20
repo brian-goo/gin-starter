@@ -14,7 +14,7 @@ func main() {
 	r := gin.Default()
 	r.Use(mdw.CORS())
 	// r.Use(mdw.AuthAPIKey())
-	// r.Use(mdw.Auth0())
+	r.Use(mdw.Auth0())
 
 	router(r)
 
@@ -27,9 +27,9 @@ func main() {
 			r.ServeHTTP(w, req)
 		}),
 		// Handler:      r,
-		ReadTimeout:  60 * time.Second,
-		WriteTimeout: 60 * time.Second,
-		// MaxHeaderBytes: ,
+		ReadTimeout:    60 * time.Second,
+		WriteTimeout:   60 * time.Second,
+		MaxHeaderBytes: 1 << 20, // 1 MB
 	}
 
 	log.Fatal("failed to start server:", server.ListenAndServe())
