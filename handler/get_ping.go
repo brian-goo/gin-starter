@@ -9,5 +9,6 @@ func GetPing(c *gin.Context) {
 
 	LogErr(c, "tt")
 
-	c.JSON(getResponse(gin.H{"status": sub}))
+	setResponse(c, gin.H{"status": sub})
+	// c.JSON(getResponse(gin.H{"status": sub}))
 }
