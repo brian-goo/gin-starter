@@ -3,6 +3,7 @@ package main
 import (
 	"gtest/endless"
 	mdw "gtest/middleware"
+	"io"
 	"log"
 	"net/http"
 	"os"
@@ -12,16 +13,13 @@ import (
 )
 
 func main() {
-	// i := &lumberjack.Logger{
-	// 	Filename:   "C:/Users/81905/Desktop/gin-starter/_log/go.log",
-	// 	MaxSize:    1, // megabytes
-	// 	MaxBackups: 60,
-	// 	MaxAge:     60, //days
-	// 	Compress:   false,
-	// }
-	// // i.Rotate()
-	// gin.DisableConsoleColor()
-	// gin.DefaultWriter = io.MultiWriter(i)
+	if os.Getenv("APP_ENV") == "DEPLOYED" {
+		i := getLogger()
+		// i.Rotate()
+		gin.DisableConsoleColor()
+		gin.DefaultWriter = io.MultiWriter(i)
+		log.SetOutput(i)
+	}
 
 	r := gin.Default()
 	r.Use(mdw.CORS())
